@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "lib": ["ES2022", "DOM"],
+    "jsx": "react",
+    "moduleResolution": "bundler",
+    "noEmit": false,
+    "outDir": "dist",
+    "paths": {
+      "@xeroscout4/shared": ["../../shared/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

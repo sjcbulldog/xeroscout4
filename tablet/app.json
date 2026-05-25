@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "XeroScout 4",
+    "slug": "xeroscout4",
+    "version": "4.0.0",
+    "orientation": "landscape",
+    "platforms": ["ios", "android", "windows"],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a2e"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.xeroscout.app"
+    },
+    "android": {
+      "package": "com.xeroscout.app"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-sqlite"
+    ],
+    "scheme": "xeroscout4"
+  }
+}

@@ -1,0 +1,16 @@
+# Server environment variables
+# Copy to .env and fill in values before running
+
+# MySQL connection
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=xeroscout
+DB_USER=xeroscout
+DB_PASS=changeme
+
+# Server
+PORT=4560
+NODE_ENV=development
+
+# Admin key for manage.js CLI
+ADMIN_SECRET=change-this-secret

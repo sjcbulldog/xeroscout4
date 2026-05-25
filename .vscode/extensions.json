@@ -1,0 +1,25 @@
+{
+    "recommendations": [
+        // TypeScript / JavaScript
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+
+        // Electron / Node debugging
+        "ms-vscode.js-debug",
+
+        // React Native (tablet)
+        "msjsdiag.vscode-react-native",
+
+        // NestJS
+        "firsttris.vscode-jest-runner",
+
+        // Git
+        "eamodio.gitlens",
+
+        // Env files
+        "mikestead.dotenv",
+
+        // REST API testing (for server endpoints)
+        "humao.rest-client"
+    ]
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XeroScout 4</title>
+  <link rel="stylesheet" href="xeroapp.css" />
+</head>
+<body>
+  <div id="app-root">
+    <div id="nav-pane"></div>
+    <div id="splitter"></div>
+    <div id="view-pane"></div>
+  </div>
+  <div id="status-bar">
+    <span id="status-left"></span>
+    <span id="status-middle"></span>
+    <span id="status-right"></span>
+  </div>
+  <div id="status-overlay" class="hidden">
+    <div id="status-overlay-text"></div>
+  </div>
+  <div id="prompt-dialog" class="hidden">
+    <div class="prompt-dialog-box">
+      <div id="prompt-title"></div>
+      <div id="prompt-message"></div>
+      <input type="text" id="prompt-input" />
+      <div class="prompt-buttons">
+        <button id="prompt-ok">OK</button>
+        <button id="prompt-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <script src="xeroapp.bundle.js"></script>
+</body>
+</html>

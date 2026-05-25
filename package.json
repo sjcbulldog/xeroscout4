@@ -1,0 +1,31 @@
+{
+  "name": "xeroscout4",
+  "version": "4.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "server",
+    "central",
+    "central/renderer",
+    "tablet"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=shared",
+    "build:server": "npm run build --workspace=server",
+    "build:central": "npm run build --workspace=central",
+    "build:renderer": "npm run build --workspace=@xeroscout4/central-renderer",
+    "build": "npm run build:shared && npm run build:server && npm run build:central && npm run build:renderer",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:central": "npm run dev --workspace=central",
+    "dev:renderer": "npm run dev --workspace=@xeroscout4/central-renderer",
+    "dev:tablet": "npm run start --workspace=tablet",
+    "test": "npm test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,1 @@
+export { MatchDbView } from './TeamDbView';

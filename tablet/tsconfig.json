@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "jsx": "react-native",
+    "lib": ["ES2022"],
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "paths": {
+      "@xeroscout4/shared": ["../shared/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*", "app/**/*"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,33 @@
+{
+    // Use the workspace TypeScript version (not VS Code's built-in)
+    "typescript.tsdk": "node_modules/typescript/lib",
+
+    // Associate .env files with dotenv syntax highlighting
+    "files.associations": {
+        ".env*": "dotenv"
+    },
+
+    // Exclude build artifacts from the explorer and search
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/.git": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true
+    },
+
+    // Default formatter
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+
+    // ESLint
+    "eslint.workingDirectories": [
+        { "directory": "shared",            "changeProcessCWD": true },
+        { "directory": "server",            "changeProcessCWD": true },
+        { "directory": "central/main",      "changeProcessCWD": true },
+        { "directory": "central/renderer",  "changeProcessCWD": true },
+        { "directory": "tablet",            "changeProcessCWD": true }
+    ]
+}

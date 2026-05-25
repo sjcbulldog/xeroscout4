@@ -1,0 +1,157 @@
+{
+    // Launch configurations for XeroScout4 Central (Electron app).
+    //
+    // Prerequisites:
+    //   - MySQL server running with credentials in central/.env
+    //   - npm install run at the monorepo root
+    //
+    // Compiled output locations (from central/main/tsconfig.json):
+    //   Main process:  central/main/dist/main/main.js
+    //   Preload:       central/main/dist/main/preload.js
+    //   Renderer:      central/renderer/dist/  (webpack output)
+    "version": "0.2.0",
+    "configurations": [
+        // ── 1. Debug Central — main process only ─────────────────────────────────
+        //    Launches Electron with the Node debugger attached to the main process.
+        //    Open the renderer DevTools manually from the View menu or via openDevTools()
+        //    (already called in development mode inside main.ts).
+        {
+            "name": "Central: Debug Main Process",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/central",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "runtimeArgs": [
+                "--remote-debugging-port=9223",
+                "."
+            ],
+            "args": [],
+            "env": {
+                "NODE_ENV": "development",
+                "ELECTRON_ENABLE_LOGGING": "1"
+            },
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/central/main/dist/main/**/*.js"
+            ],
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/central/main/**",
+                "!**/node_modules/**"
+            ],
+            "preLaunchTask": "build:central:all",
+            "presentation": {
+                "group": "central",
+                "order": 1
+            }
+        },
+
+        // ── 2. Debug Central — Coach mode ────────────────────────────────────────
+        {
+            "name": "Central: Debug Main Process (Coach)",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/central",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "runtimeArgs": [
+                "--remote-debugging-port=9223",
+                ".",
+                "coach"
+            ],
+            "args": [],
+            "env": {
+                "NODE_ENV": "development",
+                "ELECTRON_ENABLE_LOGGING": "1"
+            },
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/central/main/dist/main/**/*.js"
+            ],
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/central/main/**",
+                "!**/node_modules/**"
+            ],
+            "preLaunchTask": "build:central:all",
+            "presentation": {
+                "group": "central",
+                "order": 2
+            }
+        },
+
+        // ── 3. Attach to renderer (Chrome DevTools) ───────────────────────────────
+        //    Use AFTER one of the launch configs above has started Electron.
+        //    Electron exposes Chrome DevTools on --remote-debugging-port=9223.
+        {
+            "name": "Central: Attach Renderer",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9223,
+            "webRoot": "${workspaceFolder}/central/renderer/src",
+            "sourceMapPathOverrides": {
+                "webpack:///@xeroscout4/central-renderer/./src/*": "${workspaceFolder}/central/renderer/src/*"
+            },
+            "presentation": {
+                "group": "central",
+                "order": 3
+            }
+        },
+
+        // ── 4. Debug NestJS server standalone ────────────────────────────────────
+        //    Run the server by itself (useful for testing API endpoints independently).
+        //    Requires a .env file at server/.env with DB_* variables set.
+        {
+            "name": "Server: Debug NestJS",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/server",
+            "program": "${workspaceFolder}/server/dist/main.js",
+            "args": [],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "envFile": "${workspaceFolder}/server/.env",
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/server/dist/**/*.js"
+            ],
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/server/**",
+                "!**/node_modules/**"
+            ],
+            "preLaunchTask": "build:server",
+            "presentation": {
+                "group": "server",
+                "order": 1
+            }
+        }
+    ],
+
+    // ── Compound configurations ───────────────────────────────────────────────
+    // "Central: Full Debug" launches the main process and simultaneously attaches
+    // to the renderer so you get breakpoints in both contexts at once.
+    "compounds": [
+        {
+            "name": "Central: Full Debug (Main + Renderer)",
+            "configurations": [
+                "Central: Debug Main Process",
+                "Central: Attach Renderer"
+            ],
+            "stopAll": true,
+            "presentation": {
+                "group": "central",
+                "order": 0
+            }
+        },
+        {
+            "name": "Central: Full Debug — Coach (Main + Renderer)",
+            "configurations": [
+                "Central: Debug Main Process (Coach)",
+                "Central: Attach Renderer"
+            ],
+            "stopAll": true,
+            "presentation": {
+                "group": "central",
+                "order": 4
+            }
+        }
+    ]
+}

@@ -1,0 +1,91 @@
+{
+    // Build tasks for the XeroScout4 monorepo.
+    // Run these before launching; the launch configs reference them via "preLaunchTask".
+    "version": "2.0.0",
+    "tasks": [
+        // ── Shared ───────────────────────────────────────────────────────────────
+        {
+            "label": "build:shared",
+            "type": "shell",
+            "command": "npm run build:shared",
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "build",
+            "presentation": { "reveal": "silent", "panel": "shared" },
+            "problemMatcher": ["$tsc"]
+        },
+
+        // ── NestJS server ────────────────────────────────────────────────────────
+        {
+            "label": "build:server",
+            "type": "shell",
+            "command": "npm run build:server",
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "build",
+            "dependsOn": ["build:shared"],
+            "presentation": { "reveal": "silent", "panel": "shared" },
+            "problemMatcher": ["$tsc"]
+        },
+
+        // ── Central main process ─────────────────────────────────────────────────
+        {
+            "label": "build:central:main",
+            "type": "shell",
+            "command": "tsc -p main/tsconfig.json",
+            "options": { "cwd": "${workspaceFolder}/central" },
+            "group": "build",
+            "dependsOn": ["build:shared"],
+            "presentation": { "reveal": "silent", "panel": "shared" },
+            "problemMatcher": ["$tsc"]
+        },
+
+        // ── Renderer (webpack) ────────────────────────────────────────────────────
+        {
+            "label": "build:central:renderer",
+            "type": "shell",
+            "command": "npx webpack --mode development",
+            "options": { "cwd": "${workspaceFolder}/central/renderer" },
+            "group": "build",
+            "dependsOn": ["build:shared"],
+            "presentation": { "reveal": "silent", "panel": "shared" },
+            "problemMatcher": []
+        },
+
+        // ── Watch renderer (kept running during a debug session) ──────────────────
+        {
+            "label": "watch:central:renderer",
+            "type": "shell",
+            "command": "npx webpack --mode development --watch",
+            "options": { "cwd": "${workspaceFolder}/central/renderer" },
+            "isBackground": true,
+            "presentation": { "reveal": "silent", "panel": "dedicated", "label": "Renderer Watch" },
+            "problemMatcher": {
+                "owner": "webpack",
+                "pattern": {
+                    "regexp": "ERROR in (.+)",
+                    "file": 1,
+                    "message": 1
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "webpack is watching",
+                    "endsPattern": "compiled (successfully|with \\d+ error)"
+                }
+            }
+        },
+
+        // ── Full pre-launch build (shared + server + main + renderer) ─────────────
+        {
+            "label": "build:central:all",
+            "dependsOn": [
+                "build:shared",
+                "build:server",
+                "build:central:main",
+                "build:central:renderer"
+            ],
+            "dependsOrder": "sequence",
+            "group": { "kind": "build", "isDefault": true },
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": []
+        }
+    ]
+}
