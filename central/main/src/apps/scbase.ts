@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, Menu } from 'electron';
 import * as settings from 'electron-settings';
 import { Logger } from 'winston';
 import { ApiClient } from '../server/api-client.js';
@@ -45,6 +45,7 @@ export abstract class SCBase {
 
         await this.sendNavData();
         this.updateStatus('', `XeroScout 4 (${this.appType})`, '');
+        this.setView(this.currentEvent ? 'info' : 'startup');
     }
 
     protected sendToRenderer(channel: string, ...args: unknown[]) {
@@ -76,6 +77,14 @@ export abstract class SCBase {
 
     protected abstract onEventLoaded(): Promise<void>;
     abstract buildNavData(): NavItem[];
+    abstract createMenu(): Menu | null;
+
+    async setEventName(name: string): Promise<void> {
+        if (!this.currentEventUuid) return;
+        await this.api.updateEvent(this.currentEventUuid, { name });
+        this.currentEvent = { ...this.currentEvent!, name };
+        await this.onEventLoaded();
+    }
 
     async getInfoData(): Promise<Record<string, unknown>> {
         if (!this.currentEvent || !this.currentEventUuid) return {};
@@ -100,6 +109,8 @@ export abstract class SCBase {
             matches: (matches as unknown[]).length,
             scoutedMatches: resultList.length,
             tablets,
+            teamFormPresent: !!this.currentEvent.teamFormJson,
+            matchFormPresent: !!this.currentEvent.matchFormJson,
         };
     }
 

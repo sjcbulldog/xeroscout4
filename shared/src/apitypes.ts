@@ -31,6 +31,8 @@ export interface ApiCreateEventRequest {
     name: string;
     baEventKey?: string;
     year: number;
+    startDate?: string;
+    endDate?: string;
 }
 
 export interface ApiUpdateEventRequest {
@@ -38,6 +40,8 @@ export interface ApiUpdateEventRequest {
     locked?: boolean;
     teamFormJson?: string;
     matchFormJson?: string;
+    startDate?: string;
+    endDate?: string;
 }
 
 // ─── Teams ────────────────────────────────────────────────────────────────────

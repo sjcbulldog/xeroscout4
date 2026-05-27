@@ -6,7 +6,8 @@ export type IPCFormPurpose = 'match' | 'team';
 export type IPCFormControlType =
     | 'label' | 'text' | 'textarea' | 'boolean' | 'updown'
     | 'choice' | 'select' | 'timer' | 'stopwatch'
-    | 'box' | 'image' | 'autoplan' | 'autoselector';
+    | 'box' | 'image' | 'autoplan' | 'autoselector'
+    | 'robotphoto' | 'robotviewer';
 
 export interface IPCSize {
     width: number;
@@ -107,6 +108,14 @@ export interface IPCMultipleChoiceItem extends IPCChoicesItem {
 export interface IPCSelectItem extends IPCChoicesItem {}
 export interface IPCTimerItem extends IPCFormItem {}
 export interface IPCStopwatchItem extends IPCFormItem { holdMode?: boolean; }
+
+export type IPCRobotPhotoMode = 'capture' | 'display';
+
+export interface IPCRobotPhotoItem extends IPCFormItem {
+    mode: IPCRobotPhotoMode;
+}
+
+export interface IPCRobotViewerItem extends IPCFormItem {}
 
 export interface IPCSection {
     name: string;

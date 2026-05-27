@@ -1,14 +1,21 @@
 import './xeroapp.css';
-import { InfoView }         from './views/InfoView';
-import { TeamDbView }       from './views/TeamDbView';
-import { MatchDbView }      from './views/MatchDbView';
-import { TeamStatusView }   from './views/TeamStatusView';
-import { MatchStatusView }  from './views/MatchStatusView';
-import { FormulasView }     from './views/FormulasView';
-import { PicklistView }     from './views/PicklistView';
-import { PlayoffsView }     from './views/PlayoffsView';
-import { SingleTeamView }   from './views/SingleTeamView';
-import { TextView }         from './views/TextView';
+import { InfoView }              from './views/InfoView';
+import { TeamDbView }            from './views/TeamDbView';
+import { MatchDbView }           from './views/MatchDbView';
+import { TeamStatusView }        from './views/TeamStatusView';
+import { MatchStatusView }       from './views/MatchStatusView';
+import { FormulasView }          from './views/FormulasView';
+import { PicklistView }          from './views/PicklistView';
+import { PlayoffsView }          from './views/PlayoffsView';
+import { SingleTeamView }        from './views/SingleTeamView';
+import { TextView }              from './views/TextView';
+import { StartupView }           from './views/StartupView';
+import { SelectEventView }       from './views/SelectEventView';
+import { CreateEventView }       from './views/CreateEventView';
+import { EventSetupView }        from './views/EventSetupView';
+import { TabletAssignmentView }  from './views/TabletAssignmentView';
+import { EditTeamsView }         from './views/EditTeamsView';
+import { FormJsonView }          from './views/FormJsonView';
 
 // ── Types matching the preload contextBridge ──────────────────────────────────
 declare global {
@@ -17,6 +24,7 @@ declare global {
             getNavData(): Promise<NavItem[]>;
             splitterChanged(pos: number): Promise<void>;
             getInfoData(): Promise<unknown>;
+            setEventName(name: string): Promise<void>;
             executeCommand(cmd: string, ...args: unknown[]): Promise<unknown>;
             getForm(purpose: 'team' | 'match'): Promise<unknown>;
             saveForm(purpose: 'team' | 'match', form: unknown): Promise<void>;
@@ -64,16 +72,23 @@ export interface NavItem {
 type ViewConstructor = (container: HTMLElement, args: unknown[]) => void;
 
 const viewRegistry: Record<string, ViewConstructor> = {
-    'info':         (el, _)    => InfoView(el),
-    'team-db':      (el, _)    => TeamDbView(el),
-    'match-db':     (el, _)    => MatchDbView(el),
-    'team-status':  (el, _)    => TeamStatusView(el),
-    'match-status': (el, _)    => MatchStatusView(el),
-    'formulas':     (el, _)    => FormulasView(el),
-    'picklist':     (el, _)    => PicklistView(el),
-    'playoffs':     (el, _)    => PlayoffsView(el),
-    'singleteam':   (el, args) => SingleTeamView(el, args[0] as number | undefined),
-    'text':         (el, args) => TextView(el, args[0] as string ?? ''),
+    'info':             (el, _)    => InfoView(el),
+    'team-db':          (el, _)    => TeamDbView(el),
+    'match-db':         (el, _)    => MatchDbView(el),
+    'team-status':      (el, _)    => TeamStatusView(el),
+    'match-status':     (el, _)    => MatchStatusView(el),
+    'formulas':         (el, _)    => FormulasView(el),
+    'picklist':         (el, _)    => PicklistView(el),
+    'playoffs':         (el, _)    => PlayoffsView(el),
+    'singleteam':       (el, args) => SingleTeamView(el, args[0] as number | undefined),
+    'text':             (el, args) => TextView(el, args[0] as string ?? ''),
+    'startup':          (el, _)    => StartupView(el),
+    'select-event':     (el, args) => SelectEventView(el, args[0] as unknown[] ?? []),
+    'create-event':     (el, _)    => CreateEventView(el),
+    'event-setup':      (el, _)    => EventSetupView(el),
+    'assign-tablets':   (el, _)    => TabletAssignmentView(el),
+    'edit-teams':       (el, _)    => EditTeamsView(el),
+    'form-json':        (el, args) => FormJsonView(el, (args[0] as 'team' | 'match') ?? 'team'),
 };
 
 // ── Nav pane ──────────────────────────────────────────────────────────────────
@@ -111,9 +126,13 @@ function buildNav(items: NavItem[], container: HTMLElement) {
 }
 
 // ── View pane ─────────────────────────────────────────────────────────────────
+type ViewPaneElement = HTMLElement & { __xeroCleanup__?: () => void };
+
 function showView(view: string, args: unknown[]) {
-    const pane = document.getElementById('view-pane');
+    const pane = document.getElementById('view-pane') as ViewPaneElement | null;
     if (!pane) return;
+    pane.__xeroCleanup__?.();
+    pane.__xeroCleanup__ = undefined;
     pane.innerHTML = '';
     const fn = viewRegistry[view];
     if (fn) {

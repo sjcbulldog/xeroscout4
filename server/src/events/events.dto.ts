@@ -14,6 +14,14 @@ export class CreateEventDto implements ApiCreateEventRequest {
 
     @IsNumber()
     year!: number;
+
+    @IsOptional()
+    @IsString()
+    startDate?: string;
+
+    @IsOptional()
+    @IsString()
+    endDate?: string;
 }
 
 export class UpdateEventDto implements ApiUpdateEventRequest {
@@ -32,4 +40,12 @@ export class UpdateEventDto implements ApiUpdateEventRequest {
     @IsOptional()
     @IsString()
     matchFormJson?: string;
+
+    @IsOptional()
+    @IsString()
+    startDate?: string;
+
+    @IsOptional()
+    @IsString()
+    endDate?: string;
 }

@@ -42,6 +42,8 @@ export class EventsService {
             name: request.name,
             baEventKey: request.baEventKey ?? null,
             year: request.year,
+            startDate: request.startDate ?? null,
+            endDate: request.endDate ?? null,
             locked: false,
             teamFormJson: null,
             matchFormJson: null,
@@ -69,10 +71,22 @@ export class EventsService {
         if (request.matchFormJson !== undefined) {
             event.matchFormJson = request.matchFormJson;
         }
+        if (request.startDate !== undefined) {
+            event.startDate = request.startDate;
+        }
+        if (request.endDate !== undefined) {
+            event.endDate = request.endDate;
+        }
 
         const saved = await this.eventRepo.save(event);
         await this.syncService.recordChange('events', saved.id, 'update');
         return toApiEvent(saved);
+    }
+
+    async deleteEvent(uuid: string): Promise<void> {
+        const event = await this.getEventEntity(uuid);
+        await this.eventRepo.remove(event);
+        await this.syncService.recordChange('events', event.id, 'delete');
     }
 
     getHealth(): ApiHealthResponse {

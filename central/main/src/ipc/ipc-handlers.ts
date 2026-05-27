@@ -2,6 +2,7 @@ import { IpcMain, BrowserWindow } from 'electron';
 import { Logger } from 'winston';
 import { SCBase } from '../apps/scbase.js';
 import { SCCentral } from '../apps/sccentral.js';
+import { tbaClient } from '../extnet/blue-alliance-client.js';
 
 export function registerIpcHandlers(
     xeroApp: SCBase,
@@ -23,19 +24,30 @@ export function registerIpcHandlers(
         return xeroApp.getInfoData();
     });
 
+    ipcMain.handle('set-event-name', async (_e, name: string) => {
+        await xeroApp.setEventName(name);
+    });
+
     // ── Commands ──────────────────────────────────────────────────────────────
     ipcMain.handle('execute-command', async (_e, cmd: string, ...args: unknown[]) => {
         logger.info('execute-command', { cmd, args });
         const central = xeroApp as unknown as SCCentral;
         try {
             switch (cmd) {
-                case 'create-event':         return central.commandCreateEvent?.();
-                case 'open-event':           return central.commandOpenEvent?.();
-                case 'select-event':         return central.commandSelectEvent?.(args[0] as string);
-                case 'lock-event':           return central.commandLockEvent?.();
-                case 'import-ba':            return central.commandImportFromBA?.();
-                case 'import-statbotics':    return central.commandImportStatbotics?.();
-                case 'sync-to-cloud':        return central.commandSyncToCloud?.(args[0] as string, args[1] as string);
+                case 'delete-event':           return central.commandDeleteEvent?.(args[0] as string);
+                case 'create-event':          return central.commandCreateEvent?.();
+                case 'open-event':            return central.commandOpenEvent?.();
+                case 'select-event':          return central.commandSelectEvent?.(args[0] as string);
+                case 'close-event':           return central.commandCloseEvent?.();
+                case 'lock-event':            return central.commandLockEvent?.();
+                case 'create-event-details':  return central.commandCreateEventDetails?.(args[0] as Parameters<typeof central.commandCreateEventDetails>[0]);
+                case 'save-tablets':          return central.commandSaveTablets?.(args[0] as Parameters<typeof central.commandSaveTablets>[0]);
+                case 'save-teams':            return central.commandSaveTeams?.(args[0] as Parameters<typeof central.commandSaveTeams>[0]);
+                case 'save-form-json':        return central.commandSaveFormJson?.(args[0] as 'team' | 'match', args[1] as string);
+                case 'show-view':             return central.commandShowView?.(args[0] as string, ...args.slice(1));
+                case 'import-ba':             return central.commandImportFromBA?.();
+                case 'import-statbotics':     return central.commandImportStatbotics?.();
+                case 'sync-to-cloud':         return central.commandSyncToCloud?.(args[0] as string, args[1] as string);
                 default:
                     logger.warn('Unknown command', { cmd });
                     return { error: `Unknown command: ${cmd}` };
@@ -213,6 +225,23 @@ export function registerIpcHandlers(
         const app = xeroApp as SCBase & { currentEventUuid: string | null; api: { uploadImage(uuid: string, body: unknown): Promise<unknown> } };
         if (!app.currentEventUuid) return null;
         return app.api.uploadImage(app.currentEventUuid, { name, data, mimeType });
+    });
+
+    // ── External data queries (TBA called directly from central) ─────────────
+    ipcMain.handle('get-ba-events', async (_e, year: number) => {
+        try {
+            return await tbaClient.getEvents(year);
+        } catch (err) {
+            return { error: String(err) };
+        }
+    });
+
+    ipcMain.handle('get-tba-key', async () => {
+        return tbaClient.getApiKey();
+    });
+
+    ipcMain.handle('set-tba-key', async (_e, key: string) => {
+        await tbaClient.setApiKey(key);
     });
 
     // ── Logging ───────────────────────────────────────────────────────────────

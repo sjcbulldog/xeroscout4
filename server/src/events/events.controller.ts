@@ -1,7 +1,9 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
+    HttpCode,
     Param,
     Post,
     Put,
@@ -47,6 +49,13 @@ export class EventsController {
         @Body() request: UpdateEventDto,
     ): Promise<ApiEvent> {
         return this.eventsService.updateEvent(uuid, request);
+    }
+
+    @UseGuards(ApiKeyGuard)
+    @Delete(':uuid')
+    @HttpCode(204)
+    deleteEvent(@CurrentAuth() _auth: AuthContext, @Param('uuid') uuid: string): Promise<void> {
+        return this.eventsService.deleteEvent(uuid);
     }
 
     @Get(':uuid/health')

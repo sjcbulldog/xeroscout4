@@ -27,6 +27,8 @@ export class ApiClient {
     async getEvent(uuid: string) { return (await this.http.get(`/events/${uuid}`)).data; }
     async updateEvent(uuid: string, body: unknown) { return (await this.http.put(`/events/${uuid}`, body)).data; }
 
+    async deleteEvent(uuid: string) { return (await this.http.delete(`/events/${uuid}`)).data; }
+
     // ── Teams ─────────────────────────────────────────────────────────────────
     async listTeams(uuid: string)          { return (await this.http.get(`/events/${uuid}/teams`)).data; }
     async upsertTeams(uuid: string, body: unknown) { return (await this.http.put(`/events/${uuid}/teams`, body)).data; }

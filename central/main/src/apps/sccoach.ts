@@ -1,3 +1,4 @@
+import { Menu, MenuItem } from 'electron';
 import { Logger } from 'winston';
 import { SCBase, NavItem } from './scbase.js';
 
@@ -43,5 +44,34 @@ export class SCCoach extends SCBase {
     protected async onEventLoaded(): Promise<void> {
         this.updateStatus('', `XeroScout 4 Coach — ${this.currentEvent!.name}`, '');
         await this.sendNavData();
+    }
+
+    createMenu(): Menu {
+        const menu = new Menu();
+
+        const fileMenu = new MenuItem({ type: 'submenu', label: 'File', submenu: new Menu() });
+        fileMenu.submenu!.append(new MenuItem({
+            type: 'normal', label: 'Open Event …',
+            click: () => void this.commandOpenEvent(),
+        }));
+        fileMenu.submenu!.append(new MenuItem({ type: 'separator' }));
+        fileMenu.submenu!.append(new MenuItem({ type: 'normal', role: 'quit' }));
+        menu.append(fileMenu);
+
+        menu.append(new MenuItem({ type: 'submenu', role: 'viewMenu' }));
+
+        const helpMenu = new MenuItem({ type: 'submenu', label: 'Help', submenu: new Menu() });
+        helpMenu.submenu!.append(new MenuItem({
+            type: 'normal', label: 'About',
+            click: () => { /* TODO */ },
+        }));
+        menu.append(helpMenu);
+
+        return menu;
+    }
+
+    private async commandOpenEvent(): Promise<void> {
+        const events = await this.api.listEvents();
+        this.setView('select-event', events);
     }
 }

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, screen } from 'electron';
 import * as path from 'path';
 import * as settings from 'electron-settings';
 import { createLogger } from './logger.js';
@@ -14,14 +14,31 @@ let serverManager: ServerManager | null = null;
 
 const appType = process.argv.includes('coach') ? 'coach' : 'central';
 
+/**
+ * Returns true if enough of the window's title bar is visible on at least one
+ * current display so that the user can grab and move it.  We require ≥100 px
+ * of horizontal overlap and the very top edge of the window to be on-screen.
+ */
+function isBoundsVisible(b: Electron.Rectangle): boolean {
+    for (const display of screen.getAllDisplays()) {
+        const wa = display.workArea;
+        const overlapX = Math.min(b.x + b.width, wa.x + wa.width) - Math.max(b.x, wa.x);
+        const topVisible = b.y >= wa.y && b.y < wa.y + wa.height;
+        if (overlapX >= 100 && topVisible) return true;
+    }
+    return false;
+}
+
 async function createWindow() {
-    const bounds = (await settings.get('windowBounds')) as unknown as Electron.Rectangle | undefined;
+    const saved = (await settings.get('windowBounds')) as unknown as Electron.Rectangle | undefined;
+    const bounds = saved && isBoundsVisible(saved) ? saved : undefined;
 
     mainWindow = new BrowserWindow({
         width: bounds?.width ?? 1400,
         height: bounds?.height ?? 900,
         x: bounds?.x,
         y: bounds?.y,
+        icon: path.join(__dirname, '..', '..', '..', 'content', 'images', 'tardis.ico'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -62,6 +79,7 @@ async function main() {
     if (mainWindow) {
         registerIpcHandlers(xeroApp, mainWindow, ipcMain, logger);
         xeroApp.setWindow(mainWindow);
+        Menu.setApplicationMenu(xeroApp.createMenu());
         await xeroApp.init();
     }
 
